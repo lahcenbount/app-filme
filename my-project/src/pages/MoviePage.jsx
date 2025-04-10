@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import MovieCard from './MovieCard';
+import MovieCard from './components/MovieCard';
 import { API_KEY, BASE_URL } from "../config";
 
 const MoviePage = () => {
@@ -35,8 +35,8 @@ const MoviePage = () => {
         setSimilarMovies(similarResponse.data.results);
       } catch (err) {
         if (!axios.isCancel(err)) {
-          console.error('Erreur lors du chargement des données du film:', err);
-          setError('Erreur lors du chargement des données du film.');
+          console.error('Error fetching movie data:', err.response || err.message || err);
+          setError('Something went wrong. Please try again later.');
         }
       } finally {
         setLoading(false);

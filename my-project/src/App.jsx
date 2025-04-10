@@ -1,25 +1,18 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import MovieDetail from './components/MovieDetail';
-import Navbar from './components/Navbar';
-import './index.css'; 
+// src/App.jsx
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import HomePage from "./pages/HomePage"; // Assurez-vous que ce chemin est correct
+import Favorites from "./pages/Favorites"; // Importez le nouveau composant
 
 const App = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark', !isDarkMode);
-  };
-
   return (
     <Router>
-      <div className={`App ${isDarkMode ? 'dark' : ''}`}>
-        <Navbar toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+      <Navbar />
+      <div className="bg-gray-900 min-h-screen text-white">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
+          <Route path="/favorites" element={<Favorites />} />
         </Routes>
       </div>
     </Router>
