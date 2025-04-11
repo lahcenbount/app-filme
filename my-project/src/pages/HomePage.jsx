@@ -8,18 +8,31 @@ const HomePage = () => {
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
 
-  const API_KEY = '777d8d18'; // Clé OMDB API
+  const API_KEY = '777d8d18'; // Remplacez par votre clé OMDB API
   const BASE_URL = 'https://www.omdbapi.com/';
 
-  // Charger les favoris au montage
+  // Rechercher les films automatiquement à intervalles réguliers
+  useEffect(() => {
+    const keywords = ['action', 'comedy', 'drama', 'romance', 'thriller', 'batman', 'avengers'];
+
+    const intervalId = setInterval(() => {
+      const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+      fetchMovies(randomKeyword);
+    }, 10000); // toutes les 10 secondes
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Charger les favoris et une recherche par défaut
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem('react-movie-app-favorites')) || [];
     if (Array.isArray(storedFavorites)) {
       setFavorites(storedFavorites);
     }
+
+    fetchMovies('movie');
   }, []);
 
-  // Récupérer les films via l'API OMDB
   const fetchMovies = async (searchQuery) => {
     try {
       setLoading(true);
@@ -28,7 +41,7 @@ const HomePage = () => {
         `${BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(searchQuery)}`
       );
       if (response.data.Response === 'True') {
-        setMovies(response.data.Search);
+        setMovies(response.data.Search || []);
       } else {
         setMovies([]);
         setError(response.data.Error || 'Aucun film trouvé');
@@ -42,7 +55,6 @@ const HomePage = () => {
     }
   };
 
-  // Gérer la recherche
   const handleSearch = () => {
     if (query.trim() === '') {
       setError('Veuillez entrer un titre de film');
@@ -51,7 +63,6 @@ const HomePage = () => {
     fetchMovies(query);
   };
 
-  // Ajouter ou retirer un film des favoris
   const toggleFavorite = (movie) => {
     const updatedFavorites = favorites.some((fav) => fav.imdbID === movie.imdbID)
       ? favorites.filter((fav) => fav.imdbID !== movie.imdbID)
@@ -60,9 +71,6 @@ const HomePage = () => {
     setFavorites(updatedFavorites);
     localStorage.setItem('react-movie-app-favorites', JSON.stringify(updatedFavorites));
   };
-
-  // Gestion de la touche "Entrée" pour la recherche
-
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -73,16 +81,16 @@ const HomePage = () => {
 
         {/* Barre de recherche */}
         <div className="flex items-center space-x-2 mb-6">
-        <input
-  type="text"
-  value={query}
-  onChange={(e) => setQuery(e.target.value)}
-  placeholder="Enter movie title"
-  className="w-full px-4 py-2 border border-teal-500 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-teal-300 text-black placeholder-gray-400"
-/>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Entrez le titre d'un film"
+            className="w-full px-4 py-2 border border-teal-500 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-teal-300 text-black placeholder-gray-400"
+          />
           <button
             onClick={handleSearch}
-            disabled={loading} // Désactiver pendant le chargement
+            disabled={loading}
             className={`px-4 py-2 bg-teal-600 text-white rounded-r-lg hover:bg-teal-700 transition duration-200 ${
               loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
@@ -97,47 +105,56 @@ const HomePage = () => {
 
         {/* Résultats */}
         {!loading && movies.length > 0 && (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {movies.map((movie) => (
-              <li
-                key={movie.imdbID}
-                className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200"
-              >
-                <h3 className="text-xl font-bold text-teal-600 truncate">{movie.Title}</h3>
-                <img
-                  src={
-                    movie.Poster !== 'N/A'
-                      ? movie.Poster
-                      : 'https://via.placeholder.com/200x300?text=No+Image'
-                  }
-                  alt={movie.Title}
-                  className="w-full h-64 object-cover rounded mt-2"
-                  loading="lazy" // Optimisation
-                  onError={(e) =>
-                    (e.target.src = 'https://via.placeholder.com/200x300?text=No+Image')
-                  } // Gestion d'erreur image
-                />
-                <button
-                  onClick={() => toggleFavorite(movie)}
-                  className={`mt-3 w-full px-4 py-2 rounded text-white transition duration-200 ${
-                    favorites.some((fav) => fav.imdbID === movie.imdbID)
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-teal-600 hover:bg-teal-700'
-                  }`}
+          <>
+            <h2 className="text-2xl font-semibold text-teal-600 mb-4">
+              Collection de films
+            </h2>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {movies.map((movie) => (
+                <li
+                  key={movie.imdbID}
+                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200"
                 >
-                  {favorites.some((fav) => fav.imdbID === movie.imdbID)
-                    ? 'Retirer des favoris'
-                    : 'Ajouter aux favoris'}
-                </button>
-              </li>
-            ))}
-          </ul>
+                  <h3 className="text-xl font-bold text-teal-600 truncate">{movie.Title}</h3>
+                  <img
+                    src={
+                      movie.Poster !== 'N/A'
+                        ? movie.Poster
+                        : 'https://via.placeholder.com/200x300?text=No+Image'
+                    }
+                    alt={movie.Title}
+                    className="w-full h-64 object-cover rounded mt-2"
+                    loading="lazy"
+                    onError={(e) =>
+                      (e.target.src = 'https://via.placeholder.com/200x300?text=No+Image')
+                    }
+                  />
+                  <button
+                    onClick={() => toggleFavorite(movie)}
+                    className={`mt-3 w-full px-4 py-2 rounded text-white transition duration-200 ${
+                      favorites.some((fav) => fav.imdbID === movie.imdbID)
+                        ? 'bg-red-600 hover:bg-red-700'
+                        : 'bg-teal-600 hover:bg-teal-700'
+                    }`}
+                  >
+                    {favorites.some((fav) => fav.imdbID === movie.imdbID)
+                      ? 'Retirer des favoris'
+                      : 'Ajouter aux favoris'}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
 
-        {/* Message si aucun résultat */}
         {!loading && !error && movies.length === 0 && query && (
           <p className="text-gray-600 text-center mt-4">
             Aucun film trouvé pour "{query}".
+          </p>
+        )}
+        {!loading && !error && movies.length === 0 && !query && (
+          <p className="text-gray-600 text-center mt-4">
+            Veuillez effectuer une recherche pour voir des films.
           </p>
         )}
       </div>

@@ -1,17 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-// Note : API_KEY et BASE_URL ne sont pas utilisées ici, mais conservées pour cohérence
-const API_KEY = '777d8d18'; // Clé OMDB API (non utilisée dans ce composant)
-const BASE_URL = 'https://www.omdbapi.com/'; // OMDB API (non utilisée ici)
-
 const MovieCard = ({ movie }) => {
-  // Vérification de la validité de movie
   if (!movie || (!movie.id && !movie.imdbID)) {
     return <div className="text-center p-4">Film invalide</div>;
   }
 
-  // Déterminer si on utilise TMDb ou OMDB pour l'image
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` // TMDb
     : movie.Poster && movie.Poster !== 'N/A'
@@ -24,7 +18,7 @@ const MovieCard = ({ movie }) => {
         src={posterUrl}
         alt={movie.title || movie.Title || 'Titre indisponible'}
         className="w-full h-56 object-cover rounded-t-lg"
-        loading="lazy" // Optimisation du chargement
+        loading="lazy" 
         onError={(e) => {
           e.target.src = 'https://via.placeholder.com/200x300?text=No+Image'; // Gestion d'erreur
         }}

@@ -75,7 +75,7 @@ const MovieList = ({
           <select 
             value={filterOption}
             onChange={handleFilterChange}
-            className="p-2 border rounded-md bg-white dark:bg-gray-700 dark:text-white"
+            className="p-2 border rounded-md bg-black dark:bg-gray-700 dark:text-black"
           >
             <option value="all">Tous les films</option>
             <option value="topRated">Mieux notés</option>
@@ -85,7 +85,7 @@ const MovieList = ({
           <select 
             value={sortOption}
             onChange={handleSortChange}
-            className="p-2 border rounded-md bg-white dark:bg-gray-700 dark:text-white"
+            className="p-2 border rounded-md bg-black dark:bg-gray-700 dark:text-white"
           >
             <option value="popularity">Popularité</option>
             <option value="rating">Note</option>

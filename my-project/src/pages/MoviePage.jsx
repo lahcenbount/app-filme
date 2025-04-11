@@ -20,7 +20,7 @@ const MoviePage = () => {
         setLoading(true);
         setError(null);
         
-        // Récupération des détails du film
+          
         const movieResponse = await axios.get(
           `${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=fr`,
           { signal }
